@@ -1,19 +1,21 @@
 const express = require('express');
-const mongoose = require('mongoose');
+const connectDB = require('./config/db');
 const taskRoutes = require('./routes/tasks');
 
 const app = express();
-app.use(express.json());
 
-// MongoDB Connection
-mongoose.connect('mongodb://127.0.0.1:27017/tasktracker')
-.then(() => console.log('MongoDB connected'))
-.catch((err) => console.error('MongoDB connection error:', err));
+// Connect to DB
+connectDB();
+
+// Middleware
+app.use(express.json());
 
 // Routes
 app.use('/tasks', taskRoutes);
 
-// Server start
-const PORT = 3000;
-app.listen(PORT, () => console.log(`Server running on port ${PORT}`)
-);
+// Optional root route
+app.get('/', (req, res) => {
+  res.send('Task Tracker API is running');
+});
+
+module.exports = app;
