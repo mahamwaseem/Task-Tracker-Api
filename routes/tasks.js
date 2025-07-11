@@ -17,7 +17,7 @@ router.post('/', async (req, res) => {
     res.status(500).json({ message: 'Server error', error: err.message });
   }
 });
-//delete
+//Delete Task
   router.delete('/:taskID', async (req, res) => {
   try {
     const { taskID } = req.params;
