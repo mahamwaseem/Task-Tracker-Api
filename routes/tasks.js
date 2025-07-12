@@ -11,6 +11,7 @@ router.post('/', async (req, res) => {
     }
 
     const task = new Task({ title, description });
+    task.status = 'Created';
     await task.save();
     res.status(201).json({ message: 'Task created successfully', task });
   } catch (err) {
@@ -24,10 +25,13 @@ router.post('/', async (req, res) => {
 
     const task = await Task.findOne({ taskId: taskID });
     if (!task) return res.status(404).json({ message: 'Task not found' });
+    
+    task.status = 'Deleted'; 
+    await task.save(); 
 
     await task.deleteOne();
 
-    res.json({ message: 'Task deleted successfully', deletedTask: task });
+    res.json({ message: 'Task deleted successfully', deletedTask: task});
   } catch (err) {
     res.status(500).json({ message: 'Server error', error: err.message });
   }
@@ -44,8 +48,10 @@ router.put('/:taskId', async (req, res) => {
 
     if (title) task.title = title;
     if (description) task.description = description;
-
+    
+    task.status = 'Updated'; 
     await task.save();
+
     res.json({ message: 'Task updated successfully', task });
   } catch (err) {
     res.status(500).json({ message: 'Server error', error: err.message });
