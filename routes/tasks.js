@@ -52,8 +52,8 @@ router.put('/:taskId', async (req, res) => {
   }
 });
 
-// Submit Task (PUT /tasks/:taskId/submit)
-router.put('/:taskId/submit', async (req, res) => {
+// Submit Task (POST /tasks/:taskId/submit)
+router.post('/:taskId/submit', async (req, res) => {
   try {
     const { taskId } = req.params;
 
