@@ -6,7 +6,7 @@
      "start": "node app.js",
       "dev": "nodemon app.js",
       "build": "next build",
-     "jest": "jest --passWithNoTests"
+      "test": "jest --passWithNoTests"
 
   },
   "keywords": [],
