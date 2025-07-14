@@ -1,9 +1,9 @@
-name: Deploy the project 
+name: Deploy the project
 
 on:
   push:
     branches:
-      - main  # or replace with your branch name
+      - main
 
 jobs:
   deploy:
@@ -12,25 +12,34 @@ jobs:
       image: node:20
 
     steps:
-    - uses: actions/checkout@v3
-      with:
-        node-version: '20'
-    - run: npm install
-    - run: npm run build
-    - name: Setup SSH
-      run: |
-        mkdir -p ~/.ssh
-        echo "${{ secrets.SSH_PRIVATE_KEY }}" > ~/.ssh/id_rsa
-        chmod 600 ~/.ssh/id_rsa
-    - run: | 
-       ssh -i ~/.ssh/id_rsa ${{ secrets.SSH_USER }}@${{ secrets.SSH_HOST }} << 'EOF'
-        cd ~/node_app           # This is your project folder on the server
-        git pull origin main
-        npm install
-        pm2 restart 0
-        EOF
+      - name: Checkout Code
+        uses: actions/checkout@v3
+        with:
+          node-version: '20'
 
+      - name: Install Dependencies
+        run: npm install
 
+      - name: Build Project
+        run: npm run build
 
-        
+      - name: Setup SSH
+        run: |
+          mkdir -p ~/.ssh
+          echo "${{ secrets.SSH_PRIVATE_KEY }}" > ~/.ssh/id_rsa
+          chmod 600 ~/.ssh/id_rsa
+          ssh-keyscan -H ${{ secrets.SSH_HOST }} >> ~/.ssh/known_hosts
 
+      - name: Deploy via SSH
+        run: |
+          ssh -o StrictHostKeyChecking=no -T -i ~/.ssh/id_rsa ${{ secrets.SSH_USER }}@${{ secrets.SSH_HOST }} << 'EOF'
+            cd ~/node_app
+            echo "📦 Pulling latest code..."
+            git pull origin main
+
+            echo "📦 Installing dependencies..."
+            npm install
+
+            echo "🚀 Restarting server with PM2..."
+            pm2 restart 0
+          EOF
