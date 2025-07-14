@@ -1,4 +1,4 @@
-name: Test the project 
+name: Deploy the project 
 
 on:
   push:
@@ -6,7 +6,7 @@ on:
       - main  # or replace with your branch name
 
 jobs:
-  test:
+  deploy:
     runs-on: ubuntu-latest
     container:
       image: node:20
@@ -16,6 +16,19 @@ jobs:
       with:
         node-version: '20'
     - run: npm install
-    - run: npm test
-   # - run: npm run build
+    - run: npm run build
+    - name: Setup SSH
+      run: |
+        mkdir -p ~/.ssh
+        echo "${{ secrets.SSH_PRIVATE_KEY }}" > ~/.ssh/id_rsa
+        chmod 600 ~/.ssh/id_rsa
+       
+    - name: Deploy using SCP
+      run: |
+        scp -o StrictHostKeyhecking=no -1 ~/.ssh/id_rsa -r ./dist/* ${{secrets.SSH_PRIVATE_KEY }}@ ${{secrets.SSH_Host }}:~/node_app
+    - name: Start Server
+      run: |
+        sch -o StrictHostKeyhecking=no -1 ~/.ssh/id_rsa -r ./dist/* ${{secrets.SSH_PRIVATE_KEY }}@ ${{secrets.SSH_Host }} "cd~/node-app && npm install && pm2 restart 0"
+
+        
 
