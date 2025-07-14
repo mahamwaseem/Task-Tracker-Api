@@ -1,4 +1,4 @@
-name: Deploy to Production
+name: Deploy 
 
 on:
   push:
@@ -24,5 +24,3 @@ jobs:
     - name: Run Build
       run: npm run build
 
-    - name: Deploy (Dummy Step)
-      run: echo "Deploying your app..." 
