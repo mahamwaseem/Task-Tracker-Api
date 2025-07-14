@@ -1,26 +1,21 @@
 name: Deploy 
 
 on:
-  push:
+  pull_request:
     branches:
       - main  # or replace with your branch name
 
 jobs:
-  build-and-deploy:
+  test:
     runs-on: ubuntu-latest
+    container:
+      image: node:20
 
     steps:
-    - name: Checkout Code
-      uses: actions/checkout@v3
-
-    - name: Setup Node.js
-      uses: actions/setup-node@v3
+    - uses: actions/checkout@v3
       with:
-        node-version: '18'
-
-    - name: Install Dependencies
-      run: npm install
-
-    - name: Run Build
-      run: npm run build
+        node-version: '20'
+    - run: npm ci
+    - run: npm test
+    - run: npm run build
 
