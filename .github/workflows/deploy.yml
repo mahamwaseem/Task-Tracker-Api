@@ -22,21 +22,14 @@ jobs:
         mkdir -p ~/.ssh
         echo "${{ secrets.SSH_PRIVATE_KEY }}" > ~/.ssh/id_rsa
         chmod 600 ~/.ssh/id_rsa
-       
-   # - name: Deploy using SCP
-    #  run: |
-     #   scp -o StrictHostKeyhecking=no  -r ./dist/* ${{secrets.SSH_PRIVATE_KEY }}@ ${{secrets.     SSH_Host }}:~/node_app
-    #- name: Start Server
-     # run: |
-       # sch -o StrictHostKeyhecking=no -r ./dist/* ${{secrets.SSH_PRIVATE_KEY }}@ ${{secrets.SSH_Host }} "cd~/node-app && npm install && pm2 restart 0"
-    - name: Deploy via SSH
-      run: |
-        ssh -i ~/.ssh/id_rsa ${{ secrets.SSH_USER }}@${{ secrets.SSH_HOST }} << 'EOF'
-          cd ~/node_app           # or your actual path
-          git pull origin main
-          npm install
-          pm2 restart 0           # or your app name
+    - run: | 
+       ssh -i ~/.ssh/id_rsa ${{ secrets.SSH_USER }}@${{ secrets.SSH_HOST }} << 'EOF'
+        cd ~/node_app           # This is your project folder on the server
+        git pull origin main
+        npm install
+        pm2 restart 0
         EOF
+
 
 
         
