@@ -1,30 +1,34 @@
-name: Deploy the project
+name: Deploy the project 
 
 on:
   push:
     branches:
-      - main
+      - main  # or replace with your branch name
 
 jobs:
   deploy:
     runs-on: ubuntu-latest
+    container:
+      image: node:20
 
     steps:
-    - name: Checkout code
-      uses: actions/checkout@v3
-
+    - uses: actions/checkout@v3
+      with:
+        node-version: '20'
+    - run: npm install
+    #- run: npm run build
     - name: Setup SSH
       run: |
         mkdir -p ~/.ssh
         echo "${{ secrets.SSH_PRIVATE_KEY }}" > ~/.ssh/id_rsa
         chmod 600 ~/.ssh/id_rsa
-        ssh-keyscan -H ${{ secrets.SSH_HOST }} >> ~/.ssh/known_hosts
-
-    - name: Deploy via SSH
+       
+    - name: Deploy using SCP
       run: |
-        ssh -i ~/.ssh/id_rsa ${{ secrets.SSH_USER }}@${{ secrets.SSH_HOST }} << 'EOF'
-          cd ~/node_app
-          git pull origin main
-          npm install
-          pm2 restart 0
-        EOF
+        scp -o StrictHostKeyhecking=no  -r ./dist/* ${{secrets.SSH_PRIVATE_KEY }}@ ${{secrets.SSH_Host }}:~/node_app
+    - name: Start Server
+      run: |
+        sch -o StrictHostKeyhecking=no -r ./dist/* ${{secrets.SSH_PRIVATE_KEY }}@ ${{secrets.SSH_Host }} "cd~/node-app && npm install && pm2 restart 0"
+
+        
+
